@@ -1,0 +1,8 @@
+[package]
+name = "bool-logic"
+version = "0.1.0"
+edition = "2021"
+authors = ["Khaled Hosseini"]
+
+[dependencies]
+logos = "0.14.2"
