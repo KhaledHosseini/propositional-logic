@@ -1,7 +1,9 @@
-use std::collections::{HashMap, VecDeque};
-
+use std::collections::VecDeque;
+use indexmap::IndexMap;
 use crate::tokenizer::{Token, Tokens};
+use prettytable::{Table, Row};
 use std::fmt;
+
 
 #[derive(Debug)]
 pub struct EvaluatorError {
@@ -12,6 +14,26 @@ impl fmt::Display for EvaluatorError {
         write!(f, "{}", self.message)
     }
 }
+pub struct EvaluatorResult {
+    result: Vec<IndexMap<String, bool>>
+}
+
+impl fmt::Display for EvaluatorResult {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        let mut table = Table::new();
+        if let Some(header) = self.result.first() {
+            let header = header.iter().map(|x| x.0).collect();
+            table.add_row(header);
+        }
+        for row in self.result.iter() {
+            let values = row.iter().map(|x| x.1.to_string()).collect();
+            table.add_row(values);
+        }
+        table.printstd();
+        write!(f, "")
+    }
+}
+
 pub struct Evaluator {
    tokens: Tokens
 }
@@ -35,18 +57,18 @@ impl Evaluator {
 }
 
 impl Evaluator {
-    pub fn evaluate(&self, values: HashMap<char,char>) -> Result<HashMap<String, bool>, EvaluatorError> {
+    pub fn evaluate(&self, values: &IndexMap<char,bool>) -> Result<IndexMap<String, bool>, EvaluatorError> {
         //validate values
 
         let mut operators_stack = VecDeque::<Token>::new();
         let mut operands_stack = VecDeque::<(Option<String>,Token)>::new();
-        let mut result: HashMap<String,bool> = HashMap::new();
+        let mut result: IndexMap<String,bool> = IndexMap::new();
         let tokens: &[Token] = &self.tokens;
         for token in tokens {
             match token {
                 Token::Ident(chr) => {
-                     let v = values.get(&chr).unwrap();
-                     let v = if v.eq_ignore_ascii_case(&'T') {
+                     let v = values.get(chr).unwrap();
+                     let v = if *v {
                         Token::True
                     }else {
                         Token::False
@@ -67,7 +89,6 @@ impl Evaluator {
                   }  
                 },
                 Token::False | Token::True => operands_stack.push_front((None,token.clone())),
-                
                 _ => {
                     while operators_stack.len() > 0 && (get_priority(&operators_stack.front().unwrap())<=get_priority(&token)) {
                         Self::evaluate_operator(operators_stack.pop_front().unwrap(),&mut operands_stack);
@@ -149,25 +170,33 @@ impl Evaluator {
                 operands_stack.push_front((Some(name),ev_result));
             }
         }
-        
     }
-}
 
-impl Into<bool> for Token {
-    fn into(self) -> bool{
-        if let Token::True = self {
-            return  true;
+    pub fn evaluate_all(&self)-> Result<EvaluatorResult,EvaluatorError> {
+        let mut result: Vec<IndexMap<String, bool>> = Vec::new();
+        let tokens: &[Token] = &self.tokens;
+        let operands: Vec<char> = tokens.iter().filter_map(|t| {
+            match t {
+                Token::Ident(chr)=> {return Some(*chr);}
+                _ => None
+            }
+        }).collect();
+        let n = operands.len();
+        let rows: u64 = 1 << n;//2^n
+        for i in 0..rows {
+            let mut row: IndexMap<char,bool> = IndexMap::new();
+            for j in (0..n).rev() {
+                let v = ((i >> j) & 1) != 0;
+                row.insert(operands[n - j - 1], v);
+            }
+            if let Ok(mut eval) = self.evaluate(&row){
+                for r in row.iter().rev() {
+                    eval.insert_before(0, r.0.to_string(), *r.1);
+                }
+                result.push(eval);
+            }
         }
-        false
-    }
-}
-
-impl From<bool> for Token {
-    fn from(value: bool) -> Self {
-        if value {
-            return Token::True;
-        }
-        Token::False
+        Ok(EvaluatorResult { result })
     }
 }
 
@@ -216,9 +245,9 @@ mod tests {
         let s = "(not a)";
         let tokens = Tokens::from_text(s);
         let evaluator = Evaluator::new(tokens).unwrap();
-        let mut values = HashMap::<char,char>::new();
-        values.insert('a', 'T');
-        let result = evaluator.evaluate(values).unwrap();
+        let mut values = IndexMap::<char,bool>::new();
+        values.insert('a', true);
+        let result = evaluator.evaluate(&values).unwrap();
         assert_eq!(
             result.get("¬ a").unwrap(),&false
         );

@@ -5,4 +5,6 @@ edition = "2021"
 authors = ["Khaled Hosseini"]
 
 [dependencies]
+indexmap = "2.6.0"
 logos = "0.14.2"
+prettytable-rs = "0.10.0"

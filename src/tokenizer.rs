@@ -44,6 +44,24 @@ pub enum Token {
     True,
 }
 
+impl Into<bool> for Token {
+    fn into(self) -> bool{
+        if let Token::True = self {
+            return  true;
+        }
+        false
+    }
+}
+
+impl From<bool> for Token {
+    fn from(value: bool) -> Self {
+        if value {
+            return Token::True;
+        }
+        Token::False
+    }
+}
+
 #[derive(Debug)]
 pub struct Tokens {
     tokens: Vec<Token>,
