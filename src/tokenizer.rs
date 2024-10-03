@@ -144,4 +144,13 @@ mod tests {
             vec![Token::OpenParen,Token::Not, Token::Ident('a'),Token::CloseParen]
         );
     }
+    // #[test]
+    // fn complex() {
+    //     let s = "((p <-> q) = (p -> q) and (q -> p))";
+    //     let tokens = Tokens::from_text(s).tokens;
+    //     assert_eq!(
+    //         tokens,
+    //         vec![Token::OpenParen,Token::Not, Token::Ident('a'),Token::CloseParen]
+    //     );
+    // }
 }

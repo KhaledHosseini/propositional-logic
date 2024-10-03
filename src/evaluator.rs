@@ -1,7 +1,7 @@
-use std::collections::VecDeque;
+use std::collections::{HashSet, VecDeque};
 use indexmap::IndexMap;
 use crate::tokenizer::{Token, Tokens};
-use prettytable::{Table, Row};
+use prettytable::Table;
 use std::fmt;
 
 
@@ -177,10 +177,14 @@ impl Evaluator {
         let tokens: &[Token] = &self.tokens;
         let operands: Vec<char> = tokens.iter().filter_map(|t| {
             match t {
-                Token::Ident(chr)=> {return Some(*chr);}
+                Token::Ident(chr)=> {
+                    return Some(*chr);
+                }
                 _ => None
             }
-        }).collect();
+        }).collect::<HashSet<_>>()
+        .into_iter()
+        .collect();
         let n = operands.len();
         let rows: u64 = 1 << n;//2^n
         for i in 0..rows {
