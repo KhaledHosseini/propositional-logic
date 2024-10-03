@@ -1,4 +1,4 @@
-use std::{collections::{HashMap, VecDeque}, fmt::Error};
+use std::collections::{HashMap, VecDeque};
 
 use crate::tokenizer::{Token, Tokens};
 use std::fmt;
@@ -28,15 +28,16 @@ impl Evaluator {
             }
         }
         if p_count != 0 {
-            return  Err(EvaluatorError { message: "mis match parentheses".into() });
+            return  Err(EvaluatorError { message: "mis-match parentheses".into() });
         }
         Ok(Evaluator { tokens })
     }
 }
 
 impl Evaluator {
-    pub fn evaluate(&self, values: HashMap<char,char>) -> Result<HashMap<String, bool>, Error> {
-        
+    pub fn evaluate(&self, values: HashMap<char,char>) -> Result<HashMap<String, bool>, EvaluatorError> {
+        //validate values
+
         let mut operators_stack = VecDeque::<Token>::new();
         let mut operands_stack = VecDeque::<(Option<String>,Token)>::new();
         let mut result: HashMap<String,bool> = HashMap::new();
@@ -79,8 +80,8 @@ impl Evaluator {
     }
     fn evaluate_operator(operator: Token, operands_stack: &mut VecDeque::<(Option<String>,Token)>){
         
-        let mut ev_name = String::new();
-
+        let op_symbol: String;
+        let ev_result: Token;
         let opnd_count = get_operands_count(&operator);
         let opnd1_ =  operands_stack.pop_front().unwrap();
         let opnd1: bool = opnd1_.1.into();
@@ -93,11 +94,8 @@ impl Evaluator {
         
         match operator {
             Token::Not => {
-                let ev_result = Token::from(!opnd1);
-                if let Some(nm) = opnd1_.0 {
-                    ev_name = format!("¬{}",nm);
-                }
-                operands_stack.push_front((Some(ev_name),ev_result));
+                ev_result = Token::from(!opnd1);
+                op_symbol = "¬".into();
             },
             Token::Implication =>  {
                 let opnd = if !opnd2 {
@@ -105,11 +103,8 @@ impl Evaluator {
                 }else {
                     opnd1
                 };
-                let ev_result = Token::from(opnd);
-                if let (Some(nm1),Some(nm2)) = (opnd1_.0,opnd2_.0) {
-                    ev_name = format!("{} → {}",nm2,nm1);
-                }
-                operands_stack.push_front((Some(ev_name),ev_result));
+                ev_result = Token::from(opnd);
+                op_symbol = "→".into();
             },
             Token::ReciprocalImplication =>  {
                 let opnd = if (opnd1 && opnd2) || (!opnd1 && !opnd2) {
@@ -117,46 +112,44 @@ impl Evaluator {
                 }else {
                     false
                 };
-                let ev_result = Token::from(opnd);
-                if let (Some(nm1),Some(nm2)) = (opnd1_.0,opnd2_.0) {
-                    ev_name = format!("{} ⟷ {}",nm2,nm1);
-                }
-                operands_stack.push_front((Some(ev_name),ev_result));
+                ev_result = Token::from(opnd);
+                op_symbol = "⟷".into();
             },
             Token::And => {
                 let opnd = opnd1 && opnd2;
-                let ev_result = Token::from(opnd);
-                if let (Some(nm1),Some(nm2)) = (opnd1_.0,opnd2_.0) {
-                    ev_name = format!("{} ∧ {}",nm2,nm1);
-                }
-                operands_stack.push_front((Some(ev_name),ev_result));
+                ev_result = Token::from(opnd);
+                op_symbol = "∧".into();
             },
             Token::Or => {
                 let opnd = opnd1 || opnd2;
-                let ev_result = Token::from(opnd);
-                if let (Some(nm1),Some(nm2)) = (opnd1_.0,opnd2_.0) {
-                    ev_name = format!("{} ∨ {}",nm2,nm1);
-                }
-                operands_stack.push_front((Some(ev_name),ev_result));
+                ev_result = Token::from(opnd);
+                op_symbol = "∨".into();
             },
             Token::Equals => {
                 let opnd = (opnd1 && opnd2) || (!opnd1 && !opnd2);
-                let ev_result = Token::from(opnd);
-                if let (Some(nm1),Some(nm2)) = (opnd1_.0,opnd2_.0) {
-                    ev_name = format!("{} = {}",nm2,nm1);
-                }
-                operands_stack.push_front((Some(ev_name),ev_result));
+                ev_result = Token::from(opnd);
+                op_symbol = "=".into();
             },
             Token::NotEquals => {
                 let opnd = (!opnd1 && opnd2) || (opnd1 && !opnd2);
-                let ev_result = Token::from(opnd);
-                if let (Some(nm1),Some(nm2)) = (opnd1_.0,opnd2_.0) {
-                    ev_name = format!("{} ≠ {}",nm2,nm1);
-                }
-                operands_stack.push_front((Some(ev_name),ev_result));
+                ev_result = Token::from(opnd);
+                op_symbol = "≠".into();
             },
             _ => todo!(),
         }
+        
+        if opnd_count == 2 {
+            if let (Some(nm1),Some(nm2)) = (opnd1_.0,opnd2_.0) {
+                let name = format!("({} {} {})",nm2,op_symbol,nm1);
+                operands_stack.push_front((Some(name),ev_result));
+            }
+        }else {
+            if let Some(nm) = opnd1_.0 {
+                let name = format!("{}{}",op_symbol,nm);
+                operands_stack.push_front((Some(name),ev_result));
+            }
+        }
+        
     }
 }
 
