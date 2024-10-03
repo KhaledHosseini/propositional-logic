@@ -10,8 +10,12 @@ pub enum Token {
     #[regex("[a-zA-Z]+", |lex| lex.slice().chars().next().unwrap())]
     Ident(char),
     #[token("(")]
+    #[token("[")]
+    #[token("{")]
     OpenParen,
     #[token(")")]
+    #[token("]")]
+    #[token("}")]
     CloseParen,
     #[token("not")]
     #[token("!")]

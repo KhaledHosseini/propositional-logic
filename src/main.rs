@@ -9,12 +9,13 @@ mod evaluator;
 fn main() {
     let s = "((not a) -> b)";
     let tokens = Tokens::from_text(s);
-    let evaluator = Evaluator::new(tokens);
-    let mut values = HashMap::<char,char>::new();
-    values.insert('a', 'T');
-    values.insert('b', 'T');
-    let result = evaluator.evaluate(values).unwrap();
-    for r in result.iter() {
-        print!("{}: {}\n",r.0,r.1);
+    if let Ok(evaluator) = Evaluator::new(tokens) {
+        let mut values = HashMap::<char,char>::new();
+        values.insert('a', 'T');
+        values.insert('b', 'T');
+        let result = evaluator.evaluate(values).unwrap();
+        for r in result.iter() {
+            print!("{}: {}\n",r.0,r.1);
+        }
     }
 }

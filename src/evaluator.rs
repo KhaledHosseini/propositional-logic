@@ -1,42 +1,42 @@
 use std::{collections::{HashMap, VecDeque}, fmt::Error};
 
 use crate::tokenizer::{Token, Tokens};
+use std::fmt;
+
+#[derive(Debug)]
+pub struct EvaluatorError {
+    message: String,
+}
+impl fmt::Display for EvaluatorError {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        write!(f, "{}", self.message)
+    }
+}
 pub struct Evaluator {
    tokens: Tokens
 }
 
 impl Evaluator {
-    pub fn new(tokens: Tokens)-> Self {
-        
-        Evaluator { tokens }
+    pub fn new(tokens: Tokens)-> Result<Self,EvaluatorError> {
+        //do some validation
+        let tkns: &[Token] = &tokens;
+        let mut p_count = 0;
+        for t in tkns {
+            if let Token::OpenParen = t {p_count +=1;}
+            else if let Token::CloseParen = t {
+                p_count -=1;
+            }
+        }
+        if p_count != 0 {
+            return  Err(EvaluatorError { message: "mis match parentheses".into() });
+        }
+        Ok(Evaluator { tokens })
     }
 }
 
 impl Evaluator {
     pub fn evaluate(&self, values: HashMap<char,char>) -> Result<HashMap<String, bool>, Error> {
-        // let tokens: Vec<Token> = self.tokens.iter().map(|t| {
-        //     match t {
-        //         Token::Ident(chr) => {
-        //             let v = values.get(&chr).unwrap();
-        //             let v = if v.eq_ignore_ascii_case(&'T') {
-        //                 Token::True
-        //             }else {
-        //                 Token::False
-        //             };
-        //             v
-        //         },
-        //         Token::OpenParen => Token::OpenParen,
-        //         Token::CloseParen => Token::CloseParen,
-        //         Token::Not => Token::Not ,
-        //         Token::Implication => Token::Implication,
-        //         Token::And => Token::And,
-        //         Token::Or => Token::Or,
-        //         Token::Equals =>  Token::Equals,
-        //         Token::NotEquals => Token::NotEquals,
-        //         Token::False => Token::False,
-        //         Token::True => Token::True,
-        //     }
-        // }).collect();
+        
         let mut operators_stack = VecDeque::<Token>::new();
         let mut operands_stack = VecDeque::<(Option<String>,Token)>::new();
         let mut result: HashMap<String,bool> = HashMap::new();
@@ -222,7 +222,7 @@ mod tests {
     fn test_not_with_parenthesis() {
         let s = "(not a)";
         let tokens = Tokens::from_text(s);
-        let evaluator = Evaluator::new(tokens);
+        let evaluator = Evaluator::new(tokens).unwrap();
         let mut values = HashMap::<char,char>::new();
         values.insert('a', 'T');
         let result = evaluator.evaluate(values).unwrap();
