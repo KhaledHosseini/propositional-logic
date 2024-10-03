@@ -7,6 +7,7 @@ pub struct Evaluator {
 
 impl Evaluator {
     pub fn new(tokens: Tokens)-> Self {
+        
         Evaluator { tokens }
     }
 }
@@ -110,6 +111,18 @@ impl Evaluator {
                 }
                 operands_stack.push_front((Some(ev_name),ev_result));
             },
+            Token::ReciprocalImplication =>  {
+                let opnd = if (opnd1 && opnd2) || (!opnd1 && !opnd2) {
+                    true
+                }else {
+                    false
+                };
+                let ev_result = Token::from(opnd);
+                if let (Some(nm1),Some(nm2)) = (opnd1_.0,opnd2_.0) {
+                    ev_name = format!("{} ⟷ {}",nm2,nm1);
+                }
+                operands_stack.push_front((Some(ev_name),ev_result));
+            },
             Token::And => {
                 let opnd = opnd1 && opnd2;
                 let ev_result = Token::from(opnd);
@@ -173,6 +186,7 @@ fn get_priority(op_token: &Token)-> usize {
         Token::CloseParen => return usize::MAX,
         Token::Not => return  0,
         Token::Implication => 3,
+        Token::ReciprocalImplication => 3,
         Token::And => return  1,
         Token::Or => return  2,
         Token::Equals => 4,
@@ -188,6 +202,7 @@ fn get_operands_count(op_token: &Token)-> usize {
         Token::CloseParen => return 0,
         Token::Not => return  1,
         Token::Implication => 2,
+        Token::ReciprocalImplication => 2,
         Token::And => return  2,
         Token::Or => return  2,
         Token::Equals => 2,

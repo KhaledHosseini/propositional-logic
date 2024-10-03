@@ -18,6 +18,8 @@ pub enum Token {
     Not,
     #[token("->")]
     Implication,
+    #[token("<->")]
+    ReciprocalImplication,
     #[token("and")]
     #[token("&")]
     #[token("&&")]
@@ -28,6 +30,7 @@ pub enum Token {
     Or,
     #[token("=")]
     #[token("==")]
+    #[token("eq")]
     Equals,
     #[token("!=")]
     NotEquals,
@@ -66,6 +69,7 @@ impl Display for Tokens {
                 Token::CloseParen => f.write_char(')'),
                 Token::Not => f.write_char('¬'),
                 Token::Implication => f.write_str(" → "),
+                Token::ReciprocalImplication => f.write_str(" ⟷ "),
                 Token::And => f.write_str(" ∧ "),
                 Token::Or => f.write_str(" ∨ "),
                 Token::Equals => f.write_str(" = "),
