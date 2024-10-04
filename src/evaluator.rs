@@ -35,31 +35,62 @@ impl fmt::Display for EvaluatorResult {
 }
 
 pub struct Evaluator {
-   tokens: Tokens
+   tokens: Tokens,
+   idents: HashSet<char>
 }
 
 impl Evaluator {
     pub fn new(tokens: Tokens)-> Result<Self,EvaluatorError> {
         //do some validation
-        let tkns: &[Token] = &tokens;
-        let mut p_count = 0;
-        for t in tkns {
-            if let Token::OpenParen = t {p_count +=1;}
-            else if let Token::CloseParen = t {
-                p_count -=1;
+        let mut tokens = tokens;
+        fn check_enclosing(tkns: &[Token], left: Token, right: Token)-> Result<(),EvaluatorError> {
+            let mut p_count = 0;
+            for t in tkns {
+                if t == &left {
+                    p_count +=1;
+                }else if t == &right {
+                    p_count -=1;
+                }
             }
+            if p_count != 0 {
+                return  Err(EvaluatorError { message: "mis-match parentheses".into() });
+            }
+            Ok(())
         }
-        if p_count != 0 {
-            return  Err(EvaluatorError { message: "mis-match parentheses".into() });
+        let tkns: &[Token] = &tokens;
+        if tkns.len() == 0 {
+            return  Err(EvaluatorError { message: "Empty expression.".into() });
         }
-        Ok(Evaluator { tokens })
+
+        check_enclosing(tkns, Token::OpenParen, Token::CloseParen)?;
+        check_enclosing(tkns, Token::OpenBracket, Token::CloseBracket)?;
+        check_enclosing(tkns, Token::OpenCurlyBrace, Token::CloseCurlyBrace)?;
+
+        if tkns[0] != Token::OpenParen || tkns[0] != Token::OpenBracket || tkns[0] != Token::OpenCurlyBrace {
+            tokens.enclose(Token::OpenParen, Token::CloseParen);
+        }else if tkns[0] == Token::OpenParen || tkns[0] == Token::OpenBracket || tkns[0] == Token::OpenCurlyBrace {
+            //check cases like () = () and convert to (()=())
+            //??
+        }
+
+        let idents: HashSet<char> = tokens.iter().filter_map(|t| {
+            match t {
+                Token::Ident(chr)=> {
+                    return Some(*chr);
+                }
+                _ => None
+            }
+        }).collect();
+        Ok(Evaluator { tokens , idents})
     }
 }
 
 impl Evaluator {
     pub fn evaluate(&self, values: &IndexMap<char,bool>) -> Result<IndexMap<String, bool>, EvaluatorError> {
         //validate values
-
+        if !self.idents.iter().all(|x| values.contains_key(x)) {
+            return Err(EvaluatorError{message: "Please provide value for all idents.".into()});
+        }
         let mut operators_stack = VecDeque::<Token>::new();
         let mut operands_stack = VecDeque::<(Option<String>,Token)>::new();
         let mut result: IndexMap<String,bool> = IndexMap::new();
@@ -75,12 +106,14 @@ impl Evaluator {
                     };
                     operands_stack.push_front((Some(chr.to_string()),v));
                 },
-                Token::OpenParen => {
+                Token::OpenParen | Token::OpenBracket | Token::OpenCurlyBrace => {
                     operators_stack.push_front(token.clone());
                 },
-                Token::CloseParen => {
+                Token::CloseParen | Token::CloseBracket | Token::CloseCurlyBrace => {
                   while let Some(op) = operators_stack.pop_front() {
-                      if op == Token::OpenParen {break;}
+                      if op == Token::OpenParen || 
+                         op == Token::OpenBracket || 
+                         op == Token::OpenCurlyBrace {break;}
                       Self::evaluate_operator(op, &mut operands_stack);
                       let res = operands_stack.front().unwrap().clone();
                       if let Some(name) = res.0 {
@@ -208,8 +241,9 @@ impl Evaluator {
 fn get_priority(op_token: &Token)-> usize {
     match op_token {
         Token::Ident(_) => return usize::MAX,
-        Token::OpenParen => return usize::MAX,
-        Token::CloseParen => return usize::MAX,
+        Token::OpenParen | Token::CloseParen |
+        Token::OpenBracket | Token::CloseBracket |
+        Token::OpenCurlyBrace | Token::CloseCurlyBrace => return usize::MAX,
         Token::Not => return  0,
         Token::Implication => 3,
         Token::ReciprocalImplication => 3,
@@ -224,8 +258,9 @@ fn get_priority(op_token: &Token)-> usize {
 fn get_operands_count(op_token: &Token)-> usize {
     match op_token {
         Token::Ident(_) => return 0,
-        Token::OpenParen => return 0,
-        Token::CloseParen => return 0,
+        Token::OpenParen | Token::CloseParen |
+        Token::OpenBracket | Token::CloseBracket |
+        Token::OpenCurlyBrace | Token::CloseCurlyBrace => return 0,
         Token::Not => return  1,
         Token::Implication => 2,
         Token::ReciprocalImplication => 2,
@@ -245,7 +280,7 @@ mod tests {
     use super::*;
 
     #[test]
-    fn test_not_with_parenthesis() {
+    fn test_not() {
         let s = "(not a)";
         let tokens = Tokens::from_text(s);
         let evaluator = Evaluator::new(tokens).unwrap();
@@ -253,8 +288,7 @@ mod tests {
         values.insert('a', true);
         let result = evaluator.evaluate(&values).unwrap();
         assert_eq!(
-            result.get("¬ a").unwrap(),&false
+            result.get("¬a").unwrap(),&false
         );
-        assert_eq!(1,1);
     }
 }

@@ -10,13 +10,17 @@ pub enum Token {
     #[regex("[a-zA-Z]+", |lex| lex.slice().chars().next().unwrap())]
     Ident(char),
     #[token("(")]
-    #[token("[")]
-    #[token("{")]
     OpenParen,
     #[token(")")]
-    #[token("]")]
-    #[token("}")]
     CloseParen,
+    #[token("[")]
+    OpenBracket,
+    #[token("]")]
+    CloseBracket,
+    #[token("{")]
+    OpenCurlyBrace,
+    #[token("}")]
+    CloseCurlyBrace,
     #[token("not")]
     #[token("!")]
     Not,
@@ -73,6 +77,11 @@ impl Tokens {
             tokens: Token::lexer(text).filter_map(|result| result.ok()).collect(),
         }
     }
+    
+    pub fn enclose(&mut self, left: Token,right: Token) {
+        self.tokens.insert(0, left);
+        self.tokens.push(right);
+    }
 }
 
 impl Deref for Tokens {
@@ -89,6 +98,10 @@ impl Display for Tokens {
                 Token::Ident(c) => f.write_char(*c),
                 Token::OpenParen => f.write_char('('),
                 Token::CloseParen => f.write_char(')'),
+                Token::OpenBracket => f.write_char('['),
+                Token::CloseBracket => f.write_char(']'),
+                Token::OpenCurlyBrace => f.write_char('{'),
+                Token::CloseCurlyBrace => f.write_char('}'),
                 Token::Not => f.write_char('¬'),
                 Token::Implication => f.write_str(" → "),
                 Token::ReciprocalImplication => f.write_str(" ⟷ "),
@@ -144,13 +157,4 @@ mod tests {
             vec![Token::OpenParen,Token::Not, Token::Ident('a'),Token::CloseParen]
         );
     }
-    // #[test]
-    // fn complex() {
-    //     let s = "((p <-> q) = (p -> q) and (q -> p))";
-    //     let tokens = Tokens::from_text(s).tokens;
-    //     assert_eq!(
-    //         tokens,
-    //         vec![Token::OpenParen,Token::Not, Token::Ident('a'),Token::CloseParen]
-    //     );
-    // }
 }
