@@ -28,3 +28,9 @@ Example: </br>
 1. install `rust`. see [here](https://www.rust-lang.org/tools/install) for the instructions.
 2. run `cargo run` to run the app.
 3. run `cargo test` to run the tests.
+
+# Output formats
+You can export the truth tables to one of the following formats.
+- csv
+- html
+- pdf (does not support displaying some characters)

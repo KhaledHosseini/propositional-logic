@@ -1,7 +1,6 @@
 use std::collections::{HashSet, VecDeque};
 use indexmap::{IndexMap, IndexSet};
-use crate::tokenizer::{Token, Tokens};
-use prettytable::Table;
+use crate::{evaluator_result::EvaluatorResult, tokenizer::{Token, Tokens}};
 use std::fmt;
 
 
@@ -12,25 +11,6 @@ pub struct EvaluatorError {
 impl fmt::Display for EvaluatorError {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         write!(f, "{}", self.message)
-    }
-}
-pub struct EvaluatorResult {
-    result: Vec<IndexMap<String, bool>>
-}
-
-impl fmt::Display for EvaluatorResult {
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        let mut table = Table::new();
-        if let Some(header) = self.result.first() {
-            let header = header.iter().map(|x| x.0).collect();
-            table.add_row(header);
-        }
-        for row in self.result.iter() {
-            let values = row.iter().map(|x| x.1.to_string()).collect();
-            table.add_row(values);
-        }
-        table.printstd();
-        write!(f, "")
     }
 }
 

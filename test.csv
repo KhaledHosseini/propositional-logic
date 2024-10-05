@@ -1,0 +1,5 @@
+P,Q,¬Q,(P ∧ ¬Q),(P → Q),((P ∧ ¬Q) ↔ (P → Q))
+true,true,false,false,true,false
+true,false,true,true,false,false
+false,true,false,false,true,false
+false,false,true,false,true,false
