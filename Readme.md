@@ -13,10 +13,12 @@ Supported operators and symbols:
 Note: `Logical equivalence` means there is a proof for `Biconditional` expression. for example:</br>
 $(P↔Q) ≡ (P→Q)∧(Q→P)$ means you can prove $(P↔Q) ↔ (P→Q)∧(Q→P)$ or prove both $(P↔Q)→(P→Q)∧(Q→P)$ and $(P→Q)∧(Q→P)→(P↔Q)$. Therefore, the truth table for `≡` results in all true. but for `↔`, all result to true if it is proofable.</br>
 
-Note: the order of evaluation of operators are: `not`, `and`, `or`, `xor`, `→`, `↔`, `≡` and `≠`. Please use parentheses inorder to adjust the operator priorities. incorrect expressions result in wrong tables.
+Note: the order of evaluation of operators are: `not`, `and`, `or`, `xor`, `→`, `↔`, `≡` and `≠`. Please use parentheses inorder to adjust the operator priorities. incorrect expressions result in wrong tables.</br>
+
+Note: Characters are case sensetive. for example `q` is not the same as `Q`.
 
 Example: </br>
-- Truth table for `P ∨ (Q ∧ R) ≡ (P ∨ Q) ∧ (P ∨ R)`
+- Truth table for `P ∨ (Q ∧ R) ≡ (P ∨ Q) ∧ (P ∨ R)` or `P or (Q and R) == (P or Q) and (P or R)`
 ![truth table 1](files/tt1.png)
 
 - Truth table for `(P ∧ (∼ Q)) ⇔ (P ⇒ Q)`

@@ -20,7 +20,7 @@ fn main() {
     // let s = "P ⇒ Q ≡ ∼ P ∨ Q";
     // let s = "P ∧ Q ≡ Q ∧ P";
     // let s= "(P ∨ Q) ∧ (P ∨ R)";
-    let s = "P ∨ (Q ∧ R) ≡ (P ∨ Q) ∧ (P ∨ R)";
+    // let s = "P ∨ (Q ∧ R) ≡ (P ∨ Q) ∧ (P ∨ R)";
     let s = "(P ∧ (∼ Q)) ⇔ (P ⇒ Q)";
 
     let tokens = Tokens::from_text(s);
