@@ -21,44 +21,46 @@ pub enum Token {
     OpenCurlyBrace,
     #[token("}")]
     CloseCurlyBrace,
-    #[token("not")]
-    #[token("!")]
-    #[token("¬")]
-    #[token("∼")]
-    Not,
-    #[token("->")]
-    #[token("=>")]
-    #[token("⇒")]
-    #[token("→")]
-    #[token("⊃")]
-    Implication,
-    #[token("<->")]
-    #[token("<=>")]
-    #[token("⇔")]
-    #[token("↔")]
-    #[token("iff")]
-    #[token("xnor")]
-    Biconditional,
-    #[token("and")]
-    #[token("&")]
-    #[token("&&")]
-    #[token("∧")]
-    And,
-    #[token("or")]
-    #[token("|")]
-    #[token("||")]
-    #[token("∨")]
-    Or,
-    #[token("xor")]
-    #[token("⊕")]
-    XOr,
-    #[token("=")]
-    #[token("==")]
-    #[token("eq")]
-    #[token("≡")]
-    Equals,
-    #[token("!=")]
-    NotEquals,
+    #[token("not", |_| '¬')]
+    #[token("!", |_| '¬')]
+    #[token("¬", |_| '¬')]
+    #[token("∼", |_| '¬')]
+    #[token("~", |_| '¬')]
+    Not(char),
+    #[token("->", |_| '→')]
+    #[token("=>", |_| '→')]
+    #[token("⇒", |_| '→')]
+    #[token("→", |_| '→')]
+    #[token("⊃", |_| '→')]
+    Implication(char),
+    #[token("<->", |_| '↔')]
+    #[token("<=>", |_| '↔')]
+    #[token("⇔", |_| '↔')]
+    #[token("↔", |_| '↔')]
+    #[token("iff", |_| '↔')]
+    #[token("xnor", |_| '↔')]
+    Biconditional(char),
+    #[token("and", |_| '∧')]
+    #[token("&", |_| '∧')]
+    #[token("&&", |_| '∧')]
+    #[token("∧", |_| '∧')]
+    And(char),
+    #[token("or", |_| '∨')]
+    #[token("|", |_| '∨')]
+    #[token("||", |_| '∨')]
+    #[token("∨", |_| '∨')]
+    Or(char),
+    #[token("xor", |_| '⊕')]
+    #[token("⊕", |_| '⊕')]
+    XOr(char),
+    #[token("=", |_| '≡')]
+    #[token("==", |_| '≡')]
+    #[token("eq", |_| '≡')]
+    #[token("≡", |_| '≡')]
+    Equals(char),
+    #[token("!=", |_| '≠')]
+    #[token("≠", |_| '≠')]
+    NotEquals(char),
     #[token("0")]
     False,
     #[token("1")]
@@ -119,14 +121,14 @@ impl Display for Tokens {
                 Token::CloseBracket => f.write_char(']'),
                 Token::OpenCurlyBrace => f.write_char('{'),
                 Token::CloseCurlyBrace => f.write_char('}'),
-                Token::Not => f.write_char('¬'),
-                Token::Implication => f.write_str(" → "),
-                Token::Biconditional => f.write_str(" ↔ "),
-                Token::And => f.write_str(" ∧ "),
-                Token::Or => f.write_str(" ∨ "),
-                Token::XOr => f.write_str(" ⊕ "),
-                Token::Equals => f.write_str(" ≡ "),
-                Token::NotEquals => f.write_str(" ≠ "),
+                Token::Not(symb) |
+                Token::Implication(symb) |
+                Token::Biconditional(symb) |
+                Token::And(symb) |
+                Token::Or(symb) |
+                Token::XOr(symb) | 
+                Token::Equals(symb) | 
+                Token::NotEquals(symb) => f.write_str(&format!(" {} ",symb.to_string())),
                 Token::False => f.write_char('0'),
                 Token::True => f.write_char('1'),
             }?
@@ -144,7 +146,7 @@ mod tests {
         let s = "a -> b";
         assert_eq!(
             Tokens::from_text(s).tokens,
-            vec![Token::Ident('a'), Token::Implication, Token::Ident('b')]
+            vec![Token::Ident('a'), Token::Implication('→'), Token::Ident('b')]
         );
     }
 
@@ -153,7 +155,7 @@ mod tests {
         let s = "a == b";
         assert_eq!(
             Tokens::from_text(s).tokens,
-            vec![Token::Ident('a'), Token::Equals, Token::Ident('b')]
+            vec![Token::Ident('a'), Token::Equals('≡'), Token::Ident('b')]
         );
     }
 
@@ -162,7 +164,7 @@ mod tests {
         let s = "a != b";
         assert_eq!(
             Tokens::from_text(s).tokens,
-            vec![Token::Ident('a'), Token::NotEquals, Token::Ident('b')]
+            vec![Token::Ident('a'), Token::NotEquals('≠'), Token::Ident('b')]
         );
     }
 
@@ -172,7 +174,33 @@ mod tests {
         let tokens = Tokens::from_text(s).tokens;
         assert_eq!(
             tokens,
-            vec![Token::OpenParen,Token::Not, Token::Ident('a'),Token::CloseParen]
+            vec![Token::OpenParen,Token::Not('¬'), Token::Ident('a'),Token::CloseParen]
         );
+    }
+
+    #[test]
+    fn and() {
+        let symbols = ["and", "&", "&&", "∧"];
+        for s in symbols {
+            let expr = format!("a {} b",s);
+            let tokens = Tokens::from_text(&expr).tokens;
+            assert_eq!(
+                tokens,
+                vec![Token::Ident('a'),Token::And('∧'), Token::Ident('b')]
+            );
+        }
+    }
+
+    #[test]
+    fn or() {
+        let symbols = ["or", "|", "||", "∨"];
+        for s in symbols {
+            let expr = format!("a {} b",s);
+            let tokens = Tokens::from_text(&expr).tokens;
+            assert_eq!(
+                tokens,
+                vec![Token::Ident('a'),Token::Or('∨'), Token::Ident('b')]
+            );
+        }
     }
 }

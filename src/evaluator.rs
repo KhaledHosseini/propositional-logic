@@ -146,47 +146,52 @@ impl Evaluator {
         }
         
         match operator {
-            Token::Not => {
+            Token::Not(symbol) => {
                 ev_result = Token::from(!opnd1);
-                op_symbol = "¬".into();
+                op_symbol = symbol.into();
             },
-            Token::Implication =>  {
+            Token::Implication(symbol) =>  {
                 let opnd = if !opnd2 {
                     true
                 }else {
                     opnd1
                 };
                 ev_result = Token::from(opnd);
-                op_symbol = "→".into();
+                op_symbol = symbol.into();
             },
-            Token::Biconditional =>  {
+            Token::Biconditional(symbol) =>  {
                 let opnd = if (opnd1 && opnd2) || (!opnd1 && !opnd2) {
                     true
                 }else {
                     false
                 };
                 ev_result = Token::from(opnd);
-                op_symbol = "↔".into();
+                op_symbol = symbol.into();
             },
-            Token::And => {
+            Token::And(symbol) => {
                 let opnd = opnd1 && opnd2;
                 ev_result = Token::from(opnd);
-                op_symbol = "∧".into();
+                op_symbol = symbol.into();
             },
-            Token::Or => {
+            Token::Or(symbol) => {
                 let opnd = opnd1 || opnd2;
                 ev_result = Token::from(opnd);
-                op_symbol = "∨".into();
+                op_symbol = symbol.into();
             },
-            Token::Equals => {
+            Token::XOr(symbol) => {
+                let opnd = (opnd1 && !opnd2) || (!opnd1 && opnd2);
+                ev_result = Token::from(opnd);
+                op_symbol = symbol.into();
+            },
+            Token::Equals(symbol) => {
                 let opnd = (opnd1 && opnd2) || (!opnd1 && !opnd2);
                 ev_result = Token::from(opnd);
-                op_symbol = "≡".into();
+                op_symbol = symbol.to_string();
             },
-            Token::NotEquals => {
+            Token::NotEquals(symbol) => {
                 let opnd = (!opnd1 && opnd2) || (opnd1 && !opnd2);
                 ev_result = Token::from(opnd);
-                op_symbol = "≠".into();
+                op_symbol = symbol.into();
             },
             _ => todo!(),
         }
@@ -243,14 +248,14 @@ fn get_priority(op_token: &Token)-> usize {
         Token::OpenParen | Token::CloseParen |
         Token::OpenBracket | Token::CloseBracket |
         Token::OpenCurlyBrace | Token::CloseCurlyBrace => return usize::MAX,
-        Token::Not => return  0,
-        Token::Implication => 3,
-        Token::Biconditional => 3,
-        Token::And => return  1,
-        Token::Or => return  2,
-        Token::XOr => return  2,
-        Token::Equals => 4,
-        Token::NotEquals => 5,
+        Token::Not(_) => return  0,
+        Token::Implication(_) => 3,
+        Token::Biconditional(_) => 3,
+        Token::And(_) => return  1,
+        Token::Or(_) => return  2,
+        Token::XOr(_) => return  2,
+        Token::Equals(_) => 4,
+        Token::NotEquals(_) => 5,
         Token::False => return usize::MAX,
         Token::True => return usize::MAX,
     }
@@ -261,14 +266,14 @@ fn get_operands_count(op_token: &Token)-> usize {
         Token::OpenParen | Token::CloseParen |
         Token::OpenBracket | Token::CloseBracket |
         Token::OpenCurlyBrace | Token::CloseCurlyBrace => return 0,
-        Token::Not => return  1,
-        Token::Implication => 2,
-        Token::Biconditional => 2,
-        Token::And => return  2,
-        Token::Or => return  2,
-        Token::XOr => return  2,
-        Token::Equals => 2,
-        Token::NotEquals => 2,
+        Token::Not(_) => return  1,
+        Token::Implication(_) => 2,
+        Token::Biconditional(_) => 2,
+        Token::And(_) => return  2,
+        Token::Or(_) => return  2,
+        Token::XOr(_) => return  2,
+        Token::Equals(_) => 2,
+        Token::NotEquals(_) => 2,
         Token::False => return 0,
         Token::True => return 0,
     }
@@ -282,15 +287,19 @@ mod tests {
 
     #[test]
     fn not() {
-        let s = "not a";
-        let tokens = Tokens::from_text(s);
-        let evaluator = Evaluator::new(tokens).unwrap();
-        let mut values = IndexMap::<char,bool>::new();
-        values.insert('a', true);
-        let result = evaluator.evaluate(&values).unwrap();
-        assert_eq!(
-            result.get("¬a").unwrap(),&false
-        );
+        let symbols = ["not", "¬", "!", "∼"];
+        for s in symbols {
+            let expr = format!("{} a",s);
+            let tokens = Tokens::from_text(&expr);
+            let evaluator = Evaluator::new(tokens).unwrap();
+            let mut values = IndexMap::<char,bool>::new();
+            values.insert('a', true);
+            let result = evaluator.evaluate(&values).unwrap();
+            assert_eq!(
+                result.get("¬a").unwrap(),&false
+            );
+        }
+        
     }
 
     fn check(evaluator: &Evaluator, a: bool, b:bool, expect: bool, expr: &str) {
@@ -305,48 +314,75 @@ mod tests {
 
     #[test]
     fn and() {
-        let s = "a and b";
-        let tokens = Tokens::from_text(s);
-        let evaluator = Evaluator::new(tokens).unwrap();
-        let expr = "(a ∧ b)";
-        check(&evaluator, true, true, true,&expr);
-        check(&evaluator, true, false, false,&expr);
-        check(&evaluator, false, true, false,&expr);
-        check(&evaluator, false, false, false,&expr);
+        let symbols = ["and", "&", "&&", "∧"];
+        for s in symbols {
+            let expr = format!("a {} b",s);
+            let tokens = Tokens::from_text(&expr);
+            let evaluator = Evaluator::new(tokens).unwrap();
+            let expr = "(a ∧ b)";
+            check(&evaluator, true, true, true,&expr);
+            check(&evaluator, true, false, false,&expr);
+            check(&evaluator, false, true, false,&expr);
+            check(&evaluator, false, false, false,&expr);
+        }
     }
 
     #[test]
     fn or() {
-        let s = "a or b";
-        let tokens = Tokens::from_text(s);
-        let evaluator = Evaluator::new(tokens).unwrap();
-        let expr = "(a ∨ b)";
-        check(&evaluator, true, true, true,&expr);
-        check(&evaluator, true, false, true,&expr);
-        check(&evaluator, false, true, true,&expr);
-        check(&evaluator, false, false, false,&expr);
+        let symbols = ["or", "|", "||", "∨"];
+        for s in symbols {
+            let expr = format!("a {} b",s);
+            let tokens = Tokens::from_text(&expr);
+            let evaluator = Evaluator::new(tokens).unwrap();
+            let expr = "(a ∨ b)";
+            check(&evaluator, true, true, true,&expr);
+            check(&evaluator, true, false, true,&expr);
+            check(&evaluator, false, true, true,&expr);
+            check(&evaluator, false, false, false,&expr);
+        }
+    }
+    #[test]
+    fn xor() {
+        let symbols = ["xor", "⊕"];
+        for s in symbols {
+            let expr = format!("a {} b",s);
+            let tokens = Tokens::from_text(&expr);
+            let evaluator = Evaluator::new(tokens).unwrap();
+            let expr = "(a ⊕ b)";
+            check(&evaluator, true, true, false,&expr);
+            check(&evaluator, true, false, true,&expr);
+            check(&evaluator, false, true, true,&expr);
+            check(&evaluator, false, false, false,&expr);
+        }
     }
     #[test]
     fn implication() {
-        let s = "a ⇒ b";// "a => b", "a -> b"
-        let tokens = Tokens::from_text(s);
-        let evaluator = Evaluator::new(tokens).unwrap();
-        let expr = "(a → b)";
-        check(&evaluator, true, true, true,&expr);
-        check(&evaluator, true, false, false,&expr);
-        check(&evaluator, false, true, true,&expr);
-        check(&evaluator, false, false, true,&expr);
+        let symbols = ["->", "=>", "⇒", "→", "⊃"];
+        for s in symbols {
+            let expr = format!("a {} b",s);
+            let tokens = Tokens::from_text(&expr);
+            let evaluator = Evaluator::new(tokens).unwrap();
+            let expr = "(a → b)";
+            check(&evaluator, true, true, true,&expr);
+            check(&evaluator, true, false, false,&expr);
+            check(&evaluator, false, true, true,&expr);
+            check(&evaluator, false, false, true,&expr);
+        }
+        
     }
 
     #[test]
     fn biconditional() {
-        let s = "a ↔ b";//"a <-> b", "a <=> b"
-        let tokens = Tokens::from_text(s);
-        let evaluator = Evaluator::new(tokens).unwrap();
-        let expr = "(a ↔ b)";
-        check(&evaluator, true, true, true,&expr);
-        check(&evaluator, true, false, false,&expr);
-        check(&evaluator, false, true, false,&expr);
-        check(&evaluator, false, false, true,&expr);
+        let symbols = ["<->", "<=>", "⇔", "↔", "iff", "xnor"];
+        for s in symbols {
+            let expr = format!("a {} b",s);
+            let tokens = Tokens::from_text(&expr);
+            let evaluator = Evaluator::new(tokens).unwrap();
+            let expr = "(a ↔ b)";
+            check(&evaluator, true, true, true,&expr);
+            check(&evaluator, true, false, false,&expr);
+            check(&evaluator, false, true, false,&expr);
+            check(&evaluator, false, false, true,&expr);
+        }
     }
 }
