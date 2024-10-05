@@ -23,22 +23,39 @@ pub enum Token {
     CloseCurlyBrace,
     #[token("not")]
     #[token("!")]
+    #[token("¬")]
+    #[token("∼")]
     Not,
     #[token("->")]
+    #[token("=>")]
+    #[token("⇒")]
+    #[token("→")]
+    #[token("⊃")]
     Implication,
     #[token("<->")]
-    ReciprocalImplication,
+    #[token("<=>")]
+    #[token("⇔")]
+    #[token("↔")]
+    #[token("iff")]
+    #[token("xnor")]
+    Biconditional,
     #[token("and")]
     #[token("&")]
     #[token("&&")]
+    #[token("∧")]
     And,
     #[token("or")]
     #[token("|")]
     #[token("||")]
+    #[token("∨")]
     Or,
+    #[token("xor")]
+    #[token("⊕")]
+    XOr,
     #[token("=")]
     #[token("==")]
     #[token("eq")]
+    #[token("≡")]
     Equals,
     #[token("!=")]
     NotEquals,
@@ -104,10 +121,11 @@ impl Display for Tokens {
                 Token::CloseCurlyBrace => f.write_char('}'),
                 Token::Not => f.write_char('¬'),
                 Token::Implication => f.write_str(" → "),
-                Token::ReciprocalImplication => f.write_str(" ⟷ "),
+                Token::Biconditional => f.write_str(" ↔ "),
                 Token::And => f.write_str(" ∧ "),
                 Token::Or => f.write_str(" ∨ "),
-                Token::Equals => f.write_str(" = "),
+                Token::XOr => f.write_str(" ⊕ "),
+                Token::Equals => f.write_str(" ≡ "),
                 Token::NotEquals => f.write_str(" ≠ "),
                 Token::False => f.write_char('0'),
                 Token::True => f.write_char('1'),

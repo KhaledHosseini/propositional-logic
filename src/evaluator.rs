@@ -1,5 +1,5 @@
 use std::collections::{HashSet, VecDeque};
-use indexmap::IndexMap;
+use indexmap::{IndexMap, IndexSet};
 use crate::tokenizer::{Token, Tokens};
 use prettytable::Table;
 use std::fmt;
@@ -65,13 +65,8 @@ impl Evaluator {
         check_enclosing(tkns, Token::OpenParen, Token::CloseParen)?;
         check_enclosing(tkns, Token::OpenBracket, Token::CloseBracket)?;
         check_enclosing(tkns, Token::OpenCurlyBrace, Token::CloseCurlyBrace)?;
-
-        if tkns[0] != Token::OpenParen || tkns[0] != Token::OpenBracket || tkns[0] != Token::OpenCurlyBrace {
-            tokens.enclose(Token::OpenParen, Token::CloseParen);
-        }else if tkns[0] == Token::OpenParen || tkns[0] == Token::OpenBracket || tkns[0] == Token::OpenCurlyBrace {
-            //check cases like () = () and convert to (()=())
-            //??
-        }
+        
+        tokens.enclose(Token::OpenParen, Token::CloseParen);
 
         let idents: HashSet<char> = tokens.iter().filter_map(|t| {
             match t {
@@ -125,6 +120,10 @@ impl Evaluator {
                 _ => {
                     while operators_stack.len() > 0 && (get_priority(&operators_stack.front().unwrap())<=get_priority(&token)) {
                         Self::evaluate_operator(operators_stack.pop_front().unwrap(),&mut operands_stack);
+                        let res = operands_stack.front().unwrap().clone();
+                        if let Some(name) = res.0 {
+                            result.insert(name, res.1.into());
+                        }
                     }
                     operators_stack.push_front(token.clone());
                 }
@@ -160,14 +159,14 @@ impl Evaluator {
                 ev_result = Token::from(opnd);
                 op_symbol = "→".into();
             },
-            Token::ReciprocalImplication =>  {
+            Token::Biconditional =>  {
                 let opnd = if (opnd1 && opnd2) || (!opnd1 && !opnd2) {
                     true
                 }else {
                     false
                 };
                 ev_result = Token::from(opnd);
-                op_symbol = "⟷".into();
+                op_symbol = "↔".into();
             },
             Token::And => {
                 let opnd = opnd1 && opnd2;
@@ -182,7 +181,7 @@ impl Evaluator {
             Token::Equals => {
                 let opnd = (opnd1 && opnd2) || (!opnd1 && !opnd2);
                 ev_result = Token::from(opnd);
-                op_symbol = "=".into();
+                op_symbol = "≡".into();
             },
             Token::NotEquals => {
                 let opnd = (!opnd1 && opnd2) || (opnd1 && !opnd2);
@@ -215,7 +214,7 @@ impl Evaluator {
                 }
                 _ => None
             }
-        }).collect::<HashSet<_>>()
+        }).collect::<IndexSet<_>>()
         .into_iter()
         .collect();
         let n = operands.len();
@@ -224,7 +223,7 @@ impl Evaluator {
             let mut row: IndexMap<char,bool> = IndexMap::new();
             for j in (0..n).rev() {
                 let v = ((i >> j) & 1) != 0;
-                row.insert(operands[n - j - 1], v);
+                row.insert(operands[n - j - 1], !v);
             }
             if let Ok(mut eval) = self.evaluate(&row){
                 for r in row.iter().rev() {
@@ -246,9 +245,10 @@ fn get_priority(op_token: &Token)-> usize {
         Token::OpenCurlyBrace | Token::CloseCurlyBrace => return usize::MAX,
         Token::Not => return  0,
         Token::Implication => 3,
-        Token::ReciprocalImplication => 3,
+        Token::Biconditional => 3,
         Token::And => return  1,
         Token::Or => return  2,
+        Token::XOr => return  2,
         Token::Equals => 4,
         Token::NotEquals => 5,
         Token::False => return usize::MAX,
@@ -263,9 +263,10 @@ fn get_operands_count(op_token: &Token)-> usize {
         Token::OpenCurlyBrace | Token::CloseCurlyBrace => return 0,
         Token::Not => return  1,
         Token::Implication => 2,
-        Token::ReciprocalImplication => 2,
+        Token::Biconditional => 2,
         Token::And => return  2,
         Token::Or => return  2,
+        Token::XOr => return  2,
         Token::Equals => 2,
         Token::NotEquals => 2,
         Token::False => return 0,
@@ -280,8 +281,8 @@ mod tests {
     use super::*;
 
     #[test]
-    fn test_not() {
-        let s = "(not a)";
+    fn not() {
+        let s = "not a";
         let tokens = Tokens::from_text(s);
         let evaluator = Evaluator::new(tokens).unwrap();
         let mut values = IndexMap::<char,bool>::new();
@@ -290,5 +291,62 @@ mod tests {
         assert_eq!(
             result.get("¬a").unwrap(),&false
         );
+    }
+
+    fn check(evaluator: &Evaluator, a: bool, b:bool, expect: bool, expr: &str) {
+        let mut values = IndexMap::<char,bool>::new();
+        values.insert('a', a);
+        values.insert('b', b);
+        let result = evaluator.evaluate(&values).unwrap();
+        assert_eq!(
+            result.get(expr).unwrap(),&expect
+        );
+    }
+
+    #[test]
+    fn and() {
+        let s = "a and b";
+        let tokens = Tokens::from_text(s);
+        let evaluator = Evaluator::new(tokens).unwrap();
+        let expr = "(a ∧ b)";
+        check(&evaluator, true, true, true,&expr);
+        check(&evaluator, true, false, false,&expr);
+        check(&evaluator, false, true, false,&expr);
+        check(&evaluator, false, false, false,&expr);
+    }
+
+    #[test]
+    fn or() {
+        let s = "a or b";
+        let tokens = Tokens::from_text(s);
+        let evaluator = Evaluator::new(tokens).unwrap();
+        let expr = "(a ∨ b)";
+        check(&evaluator, true, true, true,&expr);
+        check(&evaluator, true, false, true,&expr);
+        check(&evaluator, false, true, true,&expr);
+        check(&evaluator, false, false, false,&expr);
+    }
+    #[test]
+    fn implication() {
+        let s = "a ⇒ b";// "a => b", "a -> b"
+        let tokens = Tokens::from_text(s);
+        let evaluator = Evaluator::new(tokens).unwrap();
+        let expr = "(a → b)";
+        check(&evaluator, true, true, true,&expr);
+        check(&evaluator, true, false, false,&expr);
+        check(&evaluator, false, true, true,&expr);
+        check(&evaluator, false, false, true,&expr);
+    }
+
+    #[test]
+    fn biconditional() {
+        let s = "a ↔ b";//"a <-> b", "a <=> b"
+        let tokens = Tokens::from_text(s);
+        let evaluator = Evaluator::new(tokens).unwrap();
+        let expr = "(a ↔ b)";
+        check(&evaluator, true, true, true,&expr);
+        check(&evaluator, true, false, false,&expr);
+        check(&evaluator, false, true, false,&expr);
+        check(&evaluator, false, false, true,&expr);
     }
 }
