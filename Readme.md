@@ -20,7 +20,6 @@ Example: </br>
 ![truth table 1](files/tt1.png)
 
 - Truth table for `(P ∧ (∼ Q)) ⇔ (P ⇒ Q)`
-
 ![truth table 2](files/tt2.png)
 
 # How to run
