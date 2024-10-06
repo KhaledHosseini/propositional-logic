@@ -1,6 +1,6 @@
 use std::{fmt, fs::File};
 
-use genpdf::{Element, Size};
+use genpdf::Size;
 use indexmap::IndexMap;
 use prettytable::Table;
 
@@ -15,7 +15,7 @@ impl fmt::Display for EvaluatorResult {
         write!(f, "")
     }
 }
-
+#[allow(dead_code)]
 impl EvaluatorResult {
     fn get_table(&self)-> Table {
         let mut table = Table::new();
