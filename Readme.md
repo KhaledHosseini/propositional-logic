@@ -11,6 +11,7 @@ Supported operators and symbols:
 - parentheses: `()`, `{}`, `[]`
 - True: `1`, `true`, `True`
 - False: `0`, `false`, `False`
+- Variables: `a-z`, `A-Z`
 
 **Note**: `Logical equivalence` means there is a proof for `Biconditional` expression. for example:</br>
 $(P↔Q) ≡ (P→Q)∧(Q→P)$ means you can prove $(P↔Q) ↔ (P→Q)∧(Q→P)$ or prove both $(P↔Q)→(P→Q)∧(Q→P)$ and $(P→Q)∧(Q→P)→(P↔Q)$. Therefore, the truth table for `≡` results in all true. but for `↔`, all result to true if it is proofable.</br>

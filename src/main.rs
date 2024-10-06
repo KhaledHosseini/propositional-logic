@@ -16,7 +16,7 @@ fn main() {
     // let s = "(p and q & r)";
     // let s = "P ∧ (∼ Q)";
     // let s = "P ⇒ Q";
-    // let s = "(P ∧ Q) ∧ (Q ⇒∼ P)";
+    // let s = "(P ∧ Q) ∧ (Q ⇒ ∼ P)";
     // let s = "(P ∧ Q) ⇒ (P ∨ Q)";
     // let s = "(P ∧ (∼ Q)) ⇔ (P ⇒ Q)";
     // let s = "P ⇒ Q ≡ ∼ P ∨ Q";
@@ -35,7 +35,7 @@ fn main() {
     // let s = "∼ (P ∧ Q) eq P ⇒ ∼ Q";
     // let s = "P ∧ (Q ∨ R) eq (P ∧ Q) ∨ (P ∧ R)";
     // let s = "P ∨ (Q ∧ R) eq (P ∨ Q) ∧ (P ∨ R)";
-    let s = "P ⇒∼ Q ∨ R ⇔∼ R ∧ T";//"{P ⇒ (∼ Q) ∨ R}⇔{(∼ R) ∧ T}";
+    let s = "{P ⇒ (∼Q) ∨ R} ⇔ {(∼ R) ∧ T}";//"P ⇒ ∼ Q ∨ R ⇔ ∼ R ∧ T";
     let tokens = Tokens::from_text(s);
     match Evaluator::new(tokens) {
         Ok(evaluator) => {
