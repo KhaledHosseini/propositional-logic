@@ -1,4 +1,4 @@
-# Propositional logic evalutaor written in rust.
+# Propositional logic evalutaor.
 Supported operators and symbols:
 - Not: `not`, `¬`, `!`, `∼`
 - And: `and`, `&`, `&&`, `∧`
