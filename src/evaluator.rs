@@ -96,7 +96,8 @@ impl Evaluator {
                       }
                   }  
                 },
-                Token::False | Token::True => operands_stack.push_front((None,token.clone())),
+                Token::False => operands_stack.push_front((Some("false".into()),token.clone())),
+                Token::True => operands_stack.push_front((Some("true".into()),token.clone())),
                 _ => {
                     while operators_stack.len() > 0 && (get_priority(&operators_stack.front().unwrap())<=get_priority(&token)) {
                         Self::evaluate_operator(operators_stack.pop_front().unwrap(),&mut operands_stack);
@@ -180,11 +181,15 @@ impl Evaluator {
             if let (Some(nm1),Some(nm2)) = (opnd1_.0,opnd2_.0) {
                 let name = format!("({} {} {})",nm2,op_symbol,nm1);
                 operands_stack.push_front((Some(name),ev_result));
+            }else {
+                operands_stack.push_front((Some("?".into()),ev_result));
             }
         }else {
             if let Some(nm) = opnd1_.0 {
                 let name = format!("{}{}",op_symbol,nm);
                 operands_stack.push_front((Some(name),ev_result));
+            }else {
+                operands_stack.push_front((Some("?".into()),ev_result));
             }
         }
     }

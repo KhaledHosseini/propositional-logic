@@ -62,8 +62,12 @@ pub enum Token {
     #[token("≠", |_| '≠')]
     NotEquals(char),
     #[token("0")]
+    #[token("false")]
+    #[token("False")]
     False,
     #[token("1")]
+    #[token("true")]
+    #[token("True")]
     True,
 }
 

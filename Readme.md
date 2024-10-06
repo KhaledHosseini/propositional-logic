@@ -9,11 +9,13 @@ Supported operators and symbols:
 - Logical equivalence: `=`, `==`, `eq`, `≡`
 - Not equal: `!=`, `≠`
 - parentheses: `()`, `{}`, `[]`
+- True: `1`, `true`, `True`
+- False: `0`, `false`, `False`
 
 **Note**: `Logical equivalence` means there is a proof for `Biconditional` expression. for example:</br>
 $(P↔Q) ≡ (P→Q)∧(Q→P)$ means you can prove $(P↔Q) ↔ (P→Q)∧(Q→P)$ or prove both $(P↔Q)→(P→Q)∧(Q→P)$ and $(P→Q)∧(Q→P)→(P↔Q)$. Therefore, the truth table for `≡` results in all true. but for `↔`, all result to true if it is proofable.</br>
 
-**Note**: the order of evaluation of operators are: `not`, `and`, `or`, `xor`, `→`, `↔`, `≡` and `≠`. Please use parentheses inorder to adjust the operator priorities. incorrect expressions result in wrong tables.</br>
+**Note**: the order of evaluation of operators are: `not`, `and`, `or`, `xor`, `→`, `↔`, `≡` and `≠`. Please use parentheses in order to adjust the operator priorities. incorrect expressions result in wrong tables.</br>
 
 **Note**: Characters are case sensetive. for example `q` is not the same as `Q`.
 
@@ -23,6 +25,9 @@ Example: </br>
 
 - Truth table for `(P ∧ (∼ Q)) ⇔ (P ⇒ Q)` or `(P and (not Q) <-> (P -> Q))`
 ![truth table 2](files/tt2.png)
+
+- Truth table for `not true or not false`
+![alt text](files/tt3.png)
 
 # How to run
 1. install `rust`. see [here](https://www.rust-lang.org/tools/install) for the instructions.
