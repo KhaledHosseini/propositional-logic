@@ -29,8 +29,32 @@ Example: </br>
 2. run `cargo run` to run the app.
 3. run `cargo test` to run the tests.
 
-# Output formats
+# How to use
 You can export the truth tables to one of the following formats.
 - csv
 - html
 - pdf (does not support displaying some characters)
+Or print it to terminal.
+
+```rust
+    let s = "(P and not Q) <-> (P -> Q)";//"(P ∧ (∼ Q)) ⇔ (P ⇒ Q)";
+    let tokens = Tokens::from_text(s);
+    match Evaluator::new(tokens) {
+        Ok(evaluator) => {
+            match evaluator.evaluate_all() {
+                Ok(result) => {
+                    print!("{}\n",result);
+                    // result.save_to_html("test.html");
+                    // result.save_to_csv("test.csv");
+                    // result.save_to_pdf("test.pdf");
+                },
+                Err(error) => {
+                    println!("{}",error);
+                },
+            }
+        },
+        Err(er) => {
+            println!("{}",er);
+        },
+    }
+```

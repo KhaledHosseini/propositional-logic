@@ -23,7 +23,7 @@ fn main() {
     // let s= "(P ∨ Q) ∧ (P ∨ R)";
     // let s = "P ∨ (Q ∧ R) ≡ (P ∨ Q) ∧ (P ∨ R)";
     // let s = "[(p -> q) and (r -> s)] eq [(not q or not s) -> (not p or not r)]";
-    let s = "(P ∧ (∼ Q)) ⇔ (P ⇒ Q)";
+    let s = "(P and not Q) <-> (P -> Q)";//"(P ∧ (∼ Q)) ⇔ (P ⇒ Q)";
     
     let tokens = Tokens::from_text(s);
     match Evaluator::new(tokens) {
