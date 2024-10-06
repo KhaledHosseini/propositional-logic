@@ -41,7 +41,7 @@ Example: </br>
 You can export the truth tables to one of the following formats or print it to terminal.
 - csv
 - html
-- pdf (does not support displaying some characters)
+- pdf (at the moment, does not support displaying some math characters)
 
 ```rust
     let s = "(P and not Q) <-> (P -> Q)";//"(P ∧ (∼ Q)) ⇔ (P ⇒ Q)";
