@@ -6,4 +6,15 @@ P ∧ (∼ P)
 (P ∧ Q) ∧ (Q ⇒∼ P)
 P ∧ Q ≡ Q ∧ P
 (P ∨ Q) ∧ (P ∨ R)
-P ∨ (Q ∧ R) ≡ (P ∨ Q) ∧ (P ∨ R) 
+P ∨ (Q ∧ R) ≡ (P ∨ Q) ∧ (P ∨ R)
+P ∧ Q ∧ R
+P ⇒ Q eq (∼ P) ∨ Q
+P ⇔ Q eq (P ⇒ Q) ∧ (Q ⇒ P)
+∼ (P ∧ Q) eq (∼ P) ∨ (∼ Q)
+∼ (P ∨ Q) eq (∼ P) ∧ (∼ Q)
+∼ (P ⇒ Q) eq P ∧ (∼ Q)
+∼ (P ∧ Q) eq P ⇒ ∼ Q
+P ∧ (Q ∨ R) eq (P ∧ Q) ∨ (P ∧ R)
+P ∨ (Q ∧ R) eq (P ∨ Q) ∧ (P ∨ R)
+P ⇒∼ Q ∨ R ⇔∼ R ∧ T
+{P ⇒ (∼ Q) ∨ R}⇔{(∼ R) ∧ T}

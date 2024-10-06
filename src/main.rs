@@ -25,7 +25,17 @@ fn main() {
     // let s = "P ∨ (Q ∧ R) ≡ (P ∨ Q) ∧ (P ∨ R)";
     // let s = "[(p -> q) and (r -> s)] eq [(not q or not s) -> (not p or not r)]";
     // let s = "not true or not false";
-    let s = "(P and not Q) <-> (P -> Q)";//"(P ∧ (∼ Q)) ⇔ (P ⇒ Q)";
+    // let s = "true and not p";
+    // let s = "(P and not Q) <-> (P -> Q)";//"(P ∧ (∼ Q)) ⇔ (P ⇒ Q)";
+    // let s = "P ⇒ Q eq (∼ P) ∨ Q";
+    // let s = "P ⇔ Q eq (P ⇒ Q) ∧ (Q ⇒ P)";
+    // let s = "∼ (P ∧ Q) eq (∼ P) ∨ (∼ Q)";
+    // let s = "∼ (P ∨ Q) eq (∼ P) ∧ (∼ Q)";
+    // let s = "∼ (P ⇒ Q) eq P ∧ (∼ Q)";
+    // let s = "∼ (P ∧ Q) eq P ⇒ ∼ Q";
+    // let s = "P ∧ (Q ∨ R) eq (P ∧ Q) ∨ (P ∧ R)";
+    // let s = "P ∨ (Q ∧ R) eq (P ∨ Q) ∧ (P ∨ R)";
+    let s = "P ⇒∼ Q ∨ R ⇔∼ R ∧ T";//"{P ⇒ (∼ Q) ∨ R}⇔{(∼ R) ∧ T}";
     let tokens = Tokens::from_text(s);
     match Evaluator::new(tokens) {
         Ok(evaluator) => {
@@ -57,7 +67,7 @@ fn main() {
     for v in values.iter().rev() {
         result.insert_before(0, (*v.0).into(), *v.1);
     }
-    let result = evaluator_result::EvaluatorResult{result:vec![result]};
+    let result = evaluator_result::EvaluatorResult{ result: vec![result] };
     println!("{}",result);
 
 }
