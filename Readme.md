@@ -38,11 +38,10 @@ Example: </br>
 3. run `cargo test` to run the tests.
 
 # How to use
-You can export the truth tables to one of the following formats.
+You can export the truth tables to one of the following formats or print it to terminal.
 - csv
 - html
 - pdf (does not support displaying some characters)
-Or print it to terminal.
 
 ```rust
     let s = "(P and not Q) <-> (P -> Q)";//"(P ∧ (∼ Q)) ⇔ (P ⇒ Q)";
