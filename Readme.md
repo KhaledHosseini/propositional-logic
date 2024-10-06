@@ -65,3 +65,23 @@ You can export the truth tables to one of the following formats or print it to t
         },
     }
 ```
+
+Or you can evaluate for specific values only.
+
+```rust
+    let s = "(∼ P) ∨ (∼ Q)";
+    let tokens = Tokens::from_text(s);
+    let evaluator = Evaluator::new(tokens).unwrap();
+    let mut values = IndexMap::<char,bool>::new();
+    values.insert('P', false);
+    values.insert('Q', true);
+    let mut result = evaluator.evaluate(&values).unwrap();
+    for v in values.iter().rev() {
+        result.insert_before(0, (*v.0).into(), *v.1);
+    }
+    let result = evaluator_result::EvaluatorResult{result:vec![result]};
+    println!("{}",result);
+    // result.save_to_html("test.html");
+    // result.save_to_csv("test.csv");
+    // result.save_to_pdf("test.pdf");
+```

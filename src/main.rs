@@ -1,4 +1,5 @@
 use evaluator::Evaluator;
+use indexmap::IndexMap;
 use tokenizer::Tokens;
 
 mod tokenizer;
@@ -44,4 +45,19 @@ fn main() {
             println!("{}",er);
         },
     }
+
+    //evaluate for specific values only.
+    let s = "(∼ P) ∨ (∼ Q)";
+    let tokens = Tokens::from_text(s);
+    let evaluator = Evaluator::new(tokens).unwrap();
+    let mut values = IndexMap::<char,bool>::new();
+    values.insert('P', false);
+    values.insert('Q', true);
+    let mut result = evaluator.evaluate(&values).unwrap();
+    for v in values.iter().rev() {
+        result.insert_before(0, (*v.0).into(), *v.1);
+    }
+    let result = evaluator_result::EvaluatorResult{result:vec![result]};
+    println!("{}",result);
+
 }
