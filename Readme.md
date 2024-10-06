@@ -1,4 +1,4 @@
-# Propositional logic evalutaor.
+# Propositional logic evaluator.
 Supported operators and symbols:
 - Not: `not`, `¬`, `!`, `∼`
 - And: `and`, `&`, `&&`, `∧`
