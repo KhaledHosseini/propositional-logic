@@ -35,7 +35,8 @@ fn main() {
     // let s = "∼ (P ∧ Q) eq P ⇒ ∼ Q";
     // let s = "P ∧ (Q ∨ R) eq (P ∧ Q) ∨ (P ∧ R)";
     // let s = "P ∨ (Q ∧ R) eq (P ∨ Q) ∧ (P ∨ R)";
-    let s = "{P ⇒ (∼Q) ∨ R} ⇔ {(∼ R) ∧ T}";//"P ⇒ ∼ Q ∨ R ⇔ ∼ R ∧ T";
+    // let s = "{P ⇒ (∼Q) ∨ R} ⇔ {(∼ R) ∧ T}";//"P ⇒ ∼ Q ∨ R ⇔ ∼ R ∧ T";
+    let s = "P ⇒ Q ≡ (¬Q) ⇒ (¬P)";
     let tokens = Tokens::from_text(s);
     match Evaluator::new(tokens) {
         Ok(evaluator) => {
@@ -57,17 +58,17 @@ fn main() {
     }
 
     //evaluate for specific values only.
-    let s = "(∼ P) ∨ (∼ Q)";
-    let tokens = Tokens::from_text(s);
-    let evaluator = Evaluator::new(tokens).unwrap();
-    let mut values = IndexMap::<char,bool>::new();
-    values.insert('P', false);
-    values.insert('Q', true);
-    let mut result = evaluator.evaluate(&values).unwrap();
-    for v in values.iter().rev() {
-        result.insert_before(0, (*v.0).into(), *v.1);
-    }
-    let result = evaluator_result::EvaluatorResult{ result: vec![result] };
-    println!("{}",result);
+    // let s = "(∼ P) ∨ (∼ Q)";
+    // let tokens = Tokens::from_text(s);
+    // let evaluator = Evaluator::new(tokens).unwrap();
+    // let mut values = IndexMap::<char,bool>::new();
+    // values.insert('P', false);
+    // values.insert('Q', true);
+    // let mut result = evaluator.evaluate(&values).unwrap();
+    // for v in values.iter().rev() {
+    //     result.insert_before(0, (*v.0).into(), *v.1);
+    // }
+    // let result = evaluator_result::EvaluatorResult{ result: vec![result] };
+    // println!("{}",result);
 
 }
