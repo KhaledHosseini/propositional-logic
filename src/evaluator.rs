@@ -31,6 +31,10 @@ impl Evaluator {
                 }else if t == &right {
                     p_count -=1;
                 }
+                
+                if p_count < 0 {
+                    break;
+                }
             }
             if p_count != 0 {
                 return  Err(EvaluatorError { message: "mis-match parentheses".into() });
