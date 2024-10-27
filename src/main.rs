@@ -1,6 +1,6 @@
-use bool_logic::evaluator::Evaluator;
-use bool_logic::evaluator_result;
-use bool_logic::tokenizer::Tokens;
+use boolean_logic::evaluator::Evaluator;
+use boolean_logic::evaluator_result;
+use boolean_logic::tokenizer::Tokens;
 
 
 #[allow(dead_code)]

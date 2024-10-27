@@ -1,5 +1,5 @@
 [package]
-name = "bool-logic"
+name = "boolean-logic"
 version = "0.1.0"
 edition = "2021"
 authors = ["Khaled Hosseini"]
@@ -8,7 +8,7 @@ repository = "https://github.com/KhaledHosseini/propositional-logic"
 documentation = "https://docs.rs/crate/bool-logic/"
 description = "propositional logic evaluator that creates truth tables for propositional expressions"
 license = "MIT"
-keywords = ["boolean-logic", "propositional-logic", "boolean-expression", "truth-table", "truth-table-gen"]
+keywords = ["boolean-logic","bool-logic", "propositional-logic", "boolean-expression", "truth-table", "truth-table-gen"]
 readme = "Readme.md"
 exclude = [
     "test.pdf","test.html","test.csv","expressions.txt"
@@ -20,7 +20,7 @@ edition = "2021"
 path = "src/main.rs"
 
 [lib]
-name = "bool_logic"
+name = "boolean_logic"
 
 [features]
 default = ["csv","pdf","html"]
