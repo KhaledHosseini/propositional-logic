@@ -7,6 +7,7 @@ homepage = "https://github.com/KhaledHosseini/propositional-logic"
 repository = "https://github.com/KhaledHosseini/propositional-logic"
 documentation = "https://docs.rs/crate/bool-logic/"
 description = "propositional logic evaluator that creates truth tables for propositional expressions"
+license = "MIT"
 keywords = ["boolean-logic", "propositional-logic", "boolean-expression", "truth-table", "truth-table-generator"]
 readme = "Readme.md"
 exclude = [
