@@ -3,9 +3,38 @@ name = "bool-logic"
 version = "0.1.0"
 edition = "2021"
 authors = ["Khaled Hosseini"]
+homepage = "https://github.com/KhaledHosseini/propositional-logic"
+repository = "https://github.com/KhaledHosseini/propositional-logic"
+documentation = "https://docs.rs/crate/bool-logic/"
+description = "propositional logic evaluator that creates truth tables for propositional expressions"
+keywords = ["boolean-logic", "propositional-logic", "boolean-expression", "truth-table", "truth-table-generator"]
+readme = "Readme.md"
+exclude = [
+    "test.pdf","test.html","test.csv","expressions.txt"
+]
+
+[[bin]]
+name = "main"
+edition = "2021"
+path = "src/main.rs"
+
+[lib]
+name = "bool_logic"
+
+[features]
+default = ["csv","pdf","html"]
+pdf = []
+csv = []
+html = []
 
 [dependencies]
 genpdf = "0.2.0"
 indexmap = "2.6.0"
 logos = "0.14.2"
 prettytable-rs = "0.10.0"
+
+[profile.dev]
+opt-level = 0
+
+[profile.release]
+opt-level = 3
