@@ -20,15 +20,32 @@ Supported operators and symbols:
 Example: </br>
 - Truth table for `P ∨ (Q ∧ R) ≡ (P ∨ Q) ∧ (P ∨ R)` or `P or (Q and R) == (P or Q) and (P or R)`
 
-![truth table 1](files/tt1.png)
+| P     | Q     | R     | (Q ∧ R) | (P ∨ (Q ∧ R)) | (P ∨ Q) | (P ∨ R) | ((P ∨ Q) ∧ (P ∨ R)) | ((P ∨ (Q ∧ R)) ≡ ((P ∨ Q) ∧ (P ∨ R))) |
+|-------|-------|-------|---------|---------------|---------|---------|---------------------|---------------------------------------|
+| true  | true  | true  | true    | true          | true    | true    | true                | true                                  |
+| true  | true  | false | false   | true          | true    | true    | true                | true                                  |
+| true  | false | true  | false   | true          | true    | true    | true                | true                                  |
+| true  | false | false | false   | true          | true    | true    | true                | true                                  |
+| false | true  | true  | true    | true          | true    | true    | true                | true                                  |
+| false | true  | false | false   | false         | true    | false   | false               | true                                  |
+| false | false | true  | false   | false         | false   | true    | false               | true                                  |
+| false | false | false | false   | false         | false   | false   | false               | true                                  |
+
 
 - Truth table for `(P ∧ (∼ Q)) ⇔ (P ⇒ Q)` or `(P and (not Q) <-> (P -> Q))`
 
-![truth table 2](files/tt2.png)
+| P     | Q     | ¬Q    | (P ∧ ¬Q) | (P → Q) | ((P ∧ ¬Q) ↔ (P → Q)) |
+|-------|-------|-------|----------|---------|----------------------
+| true  | true  | false | false    | true    | false                |
+| true  | false | true  | true     | false   | false                |
+| false | true  | false | false    | true    | false                |
+| false | false | true  | false    | true    | false                |
 
 - Truth table for `not true or not false`
 
-![alt text](files/tt3.png)
+| P     | Q    | ¬P   | ¬Q    | (¬P ∨ ¬Q) |
+|-------|------|------|-------|-----------
+| false | true | true | false | true      |
 
 # How to run
 1. install `rust`. see [here](https://www.rust-lang.org/tools/install) for the instructions.
