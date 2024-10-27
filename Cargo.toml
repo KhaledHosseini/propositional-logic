@@ -1,6 +1,6 @@
 [package]
 name = "boolean-logic"
-version = "0.1.1"
+version = "0.1.2"
 edition = "2021"
 authors = ["Khaled Hosseini"]
 homepage = "https://github.com/KhaledHosseini/propositional-logic"
