@@ -1,6 +1,6 @@
 [package]
 name = "boolean-logic"
-version = "0.1.0"
+version = "0.1.1"
 edition = "2021"
 authors = ["Khaled Hosseini"]
 homepage = "https://github.com/KhaledHosseini/propositional-logic"
@@ -24,12 +24,12 @@ name = "boolean_logic"
 
 [features]
 default = ["csv","pdf","html"]
-pdf = []
+pdf = ["genpdf"]
 csv = []
 html = []
 
 [dependencies]
-genpdf = "0.2.0"
+genpdf = {version = "0.2.0", optional = true }
 indexmap = "2.6.0"
 logos = "0.14.2"
 prettytable-rs = "0.10.0"
